@@ -1,7 +1,7 @@
-# Todo 1: Make file upload work
+# Todo 1: Make file upload work ✔︎
 # Todo 2: Move watermark functionality
 # Todo 3: Angle Watermark functionality
-# Todo 4: Save final image to selected destination
+# Todo 4: Save final image to selected destination ✔︎
 # Todo 5: Clean up interface
 # Todo 6: Watermark opacity
 # Todo 7: Add more fonts
@@ -11,13 +11,13 @@
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import askcolor
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from fonts import FONTS
 
 
 text_color = (0, 0, 0)
-image = "duck.jpeg"
+image = "image_placeholder.jpeg"
 
 
 def change_text_color():
@@ -41,85 +41,78 @@ def apply_watermark():
     label.image = updated_image
 
 
-def show_window():
-    uploaded_image = ImageTk.PhotoImage(Image.open(image))
-    label.configure(image=uploaded_image)
-    label.image = uploaded_image
-    window.deiconify()
-
-
 def file_open():
     global image
     image = askopenfilename()   # Add filetypes
-    # remove path info and just show filename
-    filename = image.split("/")[-1]
-    # Display selected file
-    filename_label.config(text=filename)
-    # show upload button
-    upload_button.pack()
+    uploaded_image = ImageTk.PhotoImage(Image.open(image))
+    label.configure(image=uploaded_image)
+    label.image = uploaded_image
+
+
+def save_new_image():
+    global image
+    new_image = Image.open("new_img_with_watermark.jpeg")
+    file = asksaveasfilename(title="Save Image", filetypes=[("jpeg files", "*.jpg")])
+
+    if file:
+        new_image.save(file)
 
 
 window = Tk()
 window.title("Image Watermark")
 window.resizable(False, False)
-# Hide edit window
-window.withdraw()
 
-# Upload file window
-upload_window = Toplevel(window)
-upload_window.geometry("300x200")
-upload_window.title("Upload files")
-
-
-# Choose file button
-choose_file_button = Button(upload_window, text="Choose File", command=file_open)
-choose_file_button.pack()
-# Display file name between buttons
-filename_label = Label(upload_window, text="No file selected")
-filename_label.pack()
-# Upload button
-upload_button = Button(upload_window, text="Upload", command=show_window)
+# Image frame
+image_frame = Frame(window)
+image_frame.grid(column=0, row=0, padx=10, pady=10)
 
 # Image display
 img = ImageTk.PhotoImage(Image.open(image))
-label = Label(window, image=img)
-label.pack(side=LEFT)
-label.grid(column=0, row=0, rowspan=5)
+label = Label(image_frame, image=img)
+label.grid(column=0, row=0)
+
+# edit_frame
+edit_frame = Frame(window)
+edit_frame.grid(column=1, row=0, padx=10, pady=10)
+
+# file upload button
+upload_button = Button(edit_frame, text="Upload Image", command=file_open)
+upload_button.grid(column=0, row=0, columnspan=2)
 
 # Watermark text
-watermark_label = Label(text="Watermark Text: ")
-watermark_label.grid(column=1, row=0)
-watermark_input = Entry()
-watermark_input.grid(column=2, row=0)
+watermark_label = Label(edit_frame, text="Watermark Text: ")
+watermark_label.grid(column=0, row=1)
+watermark_input = Entry(edit_frame)
+watermark_input.grid(column=1, row=1)
 
 # Font
-font_label = Label(text="Font: ")
-font_label.grid(column=1, row=1)
+font_label = Label(edit_frame, text="Font: ")
+font_label.grid(column=0, row=2)
 font_var = StringVar()
-# font_var.set("Helvetica")
-drop_menu = OptionMenu(window, font_var, FONTS[0], *FONTS)
-drop_menu.grid(column=2, row=1)
+drop_menu = OptionMenu(edit_frame, font_var, FONTS[0], *FONTS)
+drop_menu.grid(column=1, row=2)
 
 # font size
 current_value = IntVar()
-font_size_label = Label(text="Fontsize: ")
-font_size_label.grid(column=1, row=2)
-font_size = Spinbox(from_=8, to=75, textvariable=current_value, wrap=True)
-font_size.grid(column=2, row=2)
+font_size_label = Label(edit_frame, text="Fontsize: ")
+font_size_label.grid(column=0, row=3)
+font_size = Spinbox(edit_frame, from_=8, to=75, textvariable=current_value, wrap=True)
+font_size.grid(column=1, row=3)
 
 # Text color
-color_button = Button(window, text="Text Color", command=change_text_color)
-color_button.grid(column=1, row=3, columnspan=2)
+color_button = Button(edit_frame, text="Text Color", command=change_text_color)
+color_button.grid(column=0, row=4, columnspan=2)
 
 # Position
 
 # Angle
 
 
-# Button
-confirm_button = Button(text="Add Watermark", command=apply_watermark)
-confirm_button.grid(column=2, row=4)
+# Apply Button
+confirm_button = Button(edit_frame, text="Add Watermark", command=apply_watermark)
+confirm_button.grid(column=0, row=5, columnspan=2)
 
-
+# save_button
+save_button = Button(edit_frame, text="Save", command=save_new_image)
+save_button.grid(column=0, row=6, columnspan=2)
 window.mainloop()
-
