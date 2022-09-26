@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import askcolor
 from tkinter.filedialog import askopenfilename, asksaveasfilename
-from PIL import Image, ImageTk, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageTk, ImageDraw, ImageFont
 from fonts import FONTS
 
 
@@ -20,7 +20,7 @@ def width_slider_moved(event):
 
 
 def height_slider_moved(event):
-    height_label.configure(text=f"Height: {current_height.get()  - 1/2 * img_height}")
+    height_label.configure(text=f"Height: {-1 * (current_height.get()  - 1/2 * img_height)}")
 
 
 def enter_pressed(event):
@@ -116,7 +116,7 @@ window.resizable(False, False)
 
 # Image frame
 image_frame = Frame(window)
-image_frame.grid(column=0, row=0, padx=10, pady=10)
+image_frame.pack(side=LEFT, padx=10, pady=10)
 # Image display
 img = ImageTk.PhotoImage(Image.open(image))
 label = Label(image_frame, image=img)
@@ -124,7 +124,7 @@ label.grid(column=0, row=0)
 
 # edit_frame
 edit_frame = Frame(window, height=600)
-edit_frame.grid(column=1, row=0, padx=10, pady=10)
+edit_frame.pack(padx=10, pady=10)
 # file upload button
 upload_button = Button(edit_frame,
                        text="Upload Image",
@@ -134,7 +134,7 @@ upload_button.grid(column=0, row=0, columnspan=2)
 # Watermark text
 watermark_label = Label(edit_frame, text="Watermark Text: ", anchor="w")
 watermark_label.grid(column=0, row=1)
-watermark_input = Entry(edit_frame)
+watermark_input = Entry(edit_frame, width=22)
 watermark_input.grid(column=1, row=1)
 # Watermark Font
 font_label = Label(edit_frame, text="Font: ", width=12, anchor="w")
@@ -148,9 +148,9 @@ font_size_label = Label(edit_frame, text="Fontsize: ", width=12, anchor="w")
 font_size_label.grid(column=0, row=3)
 font_size = Spinbox(edit_frame,
                     from_=8,
-                    to=150,
+                    to=250,
                     wrap=True,
-                    textvariable=current_font_size)
+                    textvariable=current_font_size,)
 font_size.grid(column=1, row=3)
 # Watermark Opacity
 current_opacity = IntVar(value=100)
@@ -160,18 +160,20 @@ opacity_spinbox = Spinbox(edit_frame,
                           from_=0,
                           to=100,
                           textvariable=current_opacity,
-                          wrap=False)
+                          wrap=False,
+                          )
 opacity_spinbox.grid(column=1, row=4)
 # Watermark Color
 color_selection = Canvas(edit_frame,
                          bg=rgb_to_hex(text_color),
-                         width=15,
+                         width=110,
                          height=15)
 color_selection.grid(column=0, row=5)
 color_button = Button(edit_frame,
                       text="Change Color",
                       command=change_text_color,
-                      style="Color.TButton")
+                      style="Color.TButton",
+                      width=18)
 color_button.grid(column=1, row=5, columnspan=1)
 # Watermark Position
 height_label = Label(edit_frame, text="Height: ", width=12, anchor="w")
@@ -192,7 +194,6 @@ width_position = Scale(edit_frame,
                        to=img_width,
                        variable=current_width,
                        orient=HORIZONTAL,
-
                        command=width_slider_moved)
 width_position.grid(column=1, row=7)
 # Watermark Angle
@@ -203,7 +204,8 @@ tilt_spinbox = Spinbox(edit_frame,
                        from_=0,
                        to=359,
                        wrap=True,
-                       textvariable=current_tilt)
+                       textvariable=current_tilt,
+                       )
 tilt_spinbox.grid(column=1, row=8)
 # Apply/Update Button
 confirm_button = Button(edit_frame,
