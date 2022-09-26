@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.ttk import *
+import os
 from tkinter.colorchooser import askcolor
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from PIL import Image, ImageTk, ImageDraw, ImageFont
@@ -7,7 +8,7 @@ from fonts import FONTS
 
 
 text_color = (0, 0, 0)
-image = "image_placeholder.jpeg"
+image = None
 img_width, img_height = 600, 600
 
 
@@ -78,20 +79,32 @@ def apply_watermark():
 
 def file_open():
     global image, img_width, img_height
-    image = askopenfilename()   # Add filetypes
-    img_width, img_height = Image.open(image).size
-    # Update User Interface with values based on new Image
-    width_position.config(to=img_width)
-    height_position.config(to=img_height)
-    width_label.configure(text="Width: ")
-    height_label.configure(text="Height: ")
-    current_width.set(img_width / 2)
-    current_height.set(img_height / 2)
-    # Update Displayed Image
-    uploaded_image = ImageTk.PhotoImage(Image.open(image))
-    label.configure(image=uploaded_image)
-    label.image = uploaded_image
-    apply_watermark()
+    image = askopenfilename(title="Select An Image", filetypes=[('Images', '*.jpg *.jpeg *.png *.webp *.gif')])   # Add filetypes
+    if image:
+        img_width, img_height = Image.open(image).size
+        # Update User Interface with values based on new Image
+        width_position.config(to=img_width)
+        height_position.config(to=img_height)
+        width_label.configure(text="Width: ")
+        height_label.configure(text="Height: ")
+        current_width.set(img_width / 2)
+        current_height.set(img_height / 2)
+        # Update Displayed Image
+        uploaded_image = ImageTk.PhotoImage(Image.open(image))
+        label.configure(image=uploaded_image)
+        label.image = uploaded_image
+        apply_watermark()
+    else:
+        remove_files()
+        quit()
+
+
+def remove_files():
+    os.remove("blank_image.jpeg")
+    if os.path.exists("new_img_with_watermark.jpeg"):
+        os.remove("new_img_with_watermark.jpeg")
+    if os.path.exists("temp_image.jpeg"):
+        os.remove("temp_image.jpeg")
 
 
 def another_watermark():
@@ -118,6 +131,9 @@ window.resizable(False, False)
 image_frame = Frame(window)
 image_frame.pack(side=LEFT, padx=10, pady=10)
 # Image display
+blank_image = Image.new('RGB', (600, 600), color='white')
+blank_image.save("blank_image.jpeg")
+image = "blank_image.jpeg"
 img = ImageTk.PhotoImage(Image.open(image))
 label = Label(image_frame, image=img)
 label.grid(column=0, row=0)
@@ -175,7 +191,7 @@ color_button = Button(edit_frame,
                       style="Color.TButton",
                       width=18)
 color_button.grid(column=1, row=5, columnspan=1)
-# Watermark Position
+# Watermark Height
 height_label = Label(edit_frame, text="Height: ", width=12, anchor="w")
 height_label.grid(column=0, row=6)
 current_height = IntVar(value=img_height / 2)
@@ -186,6 +202,7 @@ height_position = Scale(edit_frame,
                         orient=VERTICAL,
                         command=height_slider_moved)
 height_position.grid(column=1, row=6)
+# Watermark Width
 width_label = Label(edit_frame, text="Width: ", width=12, anchor="w")
 width_label.grid(column=0, row=7)
 current_width = IntVar(value=img_height / 2)
@@ -232,4 +249,11 @@ window.bind('<Return>', enter_pressed)
 # GUI Style
 style = Style(window)
 style.configure('Wide.TButton', width=30, padding=5)
+
+# Hide window, open file, and open window back up
+window.withdraw()
+file_open()
+window.deiconify()
+
 window.mainloop()
+remove_files()
