@@ -1,8 +1,3 @@
-# Todo 5: Clean up interface
-# Todo 7: Add more fonts
-# Todo 7: Save favorite watermarks
-# Todo 8: Edit multiple photos
-
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import askcolor
