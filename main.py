@@ -255,5 +255,6 @@ window.withdraw()
 file_open()
 window.deiconify()
 
-window.mainloop()
-remove_files()
+if __name__ == '__main__':
+    window.mainloop()
+    remove_files()
