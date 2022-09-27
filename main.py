@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter.ttk import *
-import os
 from tkinter.colorchooser import askcolor
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from fonts import FONTS
+import os
 
+basedir = os.path.dirname(__file__)
 
 text_color = (0, 0, 0)
 image = None
@@ -31,8 +32,8 @@ def enter_pressed(event):
 def change_text_color():
     colors = askcolor(title="Watermark Color Chooser")
     global text_color
-    text_color = colors[0]
-    color_selection.configure(bg=colors[1])
+    text_color = colors[0]      # colors[0] is RGB value
+    color_selection.configure(bg=colors[1])     # colors[1] is hex value
 
 
 def apply_watermark():
@@ -69,17 +70,17 @@ def apply_watermark():
     Image.Image.paste(d, text_image, text_position)
     # Combine image with text and save image
     combined = Image.alpha_composite(watermark_image, d).convert('RGB')
-    combined.save("new_img_with_watermark.jpeg", format='JPEG')
+    combined.save((os.path.join(basedir, "new_img_with_watermark.jpeg")), format='JPEG')
     watermark_image.close()
     # Apply changes to screen
-    updated_image = ImageTk.PhotoImage(Image.open("new_img_with_watermark.jpeg"))
+    updated_image = ImageTk.PhotoImage(Image.open(os.path.join(basedir, "new_img_with_watermark.jpeg")))
     label.configure(image=updated_image)
     label.image = updated_image
 
 
 def file_open():
     global image, img_width, img_height
-    image = askopenfilename(title="Select An Image", filetypes=[('Images', '*.jpg *.jpeg *.png *.webp *.gif')])   # Add filetypes
+    image = askopenfilename(title="Select An Image", filetypes=[('Images', '*.jpg *.jpeg *.png *.webp *.gif')])
     if image:
         img_width, img_height = Image.open(image).size
         # Update User Interface with values based on new Image
@@ -87,8 +88,8 @@ def file_open():
         height_position.config(to=img_height)
         width_label.configure(text="Width: ")
         height_label.configure(text="Height: ")
-        current_width.set(img_width / 2)
-        current_height.set(img_height / 2)
+        current_width.set(int(img_width / 2))
+        current_height.set(int(img_height / 2))
         # Update Displayed Image
         uploaded_image = ImageTk.PhotoImage(Image.open(image))
         label.configure(image=uploaded_image)
@@ -109,14 +110,14 @@ def remove_files():
 
 def another_watermark():
     global image
-    temp_image = Image.open("new_img_with_watermark.jpeg")
-    temp_image.save("temp_image.jpeg")
-    image = "temp_image.jpeg"
+    temp_image = Image.open(os.path.join(basedir, "new_img_with_watermark.jpeg"))
+    temp_image.save(os.path.join(basedir, "temp_image.jpeg"))
+    image = (os.path.join(basedir, "temp_image.jpeg"))
     temp_image.close()
 
 
 def save_new_image():
-    new_image = Image.open("new_img_with_watermark.jpeg")
+    new_image = Image.open(os.path.join(basedir, "new_img_with_watermark.jpeg"))
     file = asksaveasfilename(title="Save Image", filetypes=[("jpeg files", "*.jpg")])
     if file:
         new_image.save(file)
@@ -132,8 +133,8 @@ image_frame = Frame(window)
 image_frame.pack(side=LEFT, padx=10, pady=10)
 # Image display
 blank_image = Image.new('RGB', (600, 600), color='white')
-blank_image.save("blank_image.jpeg")
-image = "blank_image.jpeg"
+blank_image.save((os.path.join(basedir, "blank_image.jpeg")))
+image = (os.path.join(basedir, "blank_image.jpeg"))
 img = ImageTk.PhotoImage(Image.open(image))
 label = Label(image_frame, image=img)
 label.grid(column=0, row=0)
@@ -160,7 +161,7 @@ drop_menu = OptionMenu(edit_frame, font_var, FONTS[0], *FONTS)
 drop_menu.grid(column=1, row=2)
 # Watermark Font Size
 current_font_size = IntVar(value=30)
-font_size_label = Label(edit_frame, text="Fontsize: ", width=12, anchor="w")
+font_size_label = Label(edit_frame, text="Font size: ", width=12, anchor="w")
 font_size_label.grid(column=0, row=3)
 font_size = Spinbox(edit_frame,
                     from_=8,
@@ -194,7 +195,7 @@ color_button.grid(column=1, row=5, columnspan=1)
 # Watermark Height
 height_label = Label(edit_frame, text="Height: ", width=12, anchor="w")
 height_label.grid(column=0, row=6)
-current_height = IntVar(value=img_height / 2)
+current_height = IntVar(value=int(img_height / 2))
 height_position = Scale(edit_frame,
                         from_=0,
                         to=img_height,
@@ -205,7 +206,7 @@ height_position.grid(column=1, row=6)
 # Watermark Width
 width_label = Label(edit_frame, text="Width: ", width=12, anchor="w")
 width_label.grid(column=0, row=7)
-current_width = IntVar(value=img_height / 2)
+current_width = IntVar(value=int(img_height / 2))
 width_position = Scale(edit_frame,
                        from_=0,
                        to=img_width,
