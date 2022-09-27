@@ -8,10 +8,6 @@ import os
 
 basedir = os.path.dirname(__file__)
 
-text_color = (0, 0, 0)
-image = None
-img_width, img_height = 600, 600
-
 
 def rgb_to_hex(rgb):
     return "#%02x%02x%02x" % rgb
@@ -181,6 +177,7 @@ opacity_spinbox = Spinbox(edit_frame,
                           )
 opacity_spinbox.grid(column=1, row=4)
 # Watermark Color
+text_color = (0, 0, 0)
 color_selection = Canvas(edit_frame,
                          bg=rgb_to_hex(text_color),
                          width=110,
@@ -193,6 +190,7 @@ color_button = Button(edit_frame,
                       width=18)
 color_button.grid(column=1, row=5, columnspan=1)
 # Watermark Height
+img_width, img_height = 600, 600
 height_label = Label(edit_frame, text="Height: ", width=12, anchor="w")
 height_label.grid(column=0, row=6)
 current_height = IntVar(value=int(img_height / 2))
@@ -251,7 +249,7 @@ window.bind('<Return>', enter_pressed)
 style = Style(window)
 style.configure('Wide.TButton', width=30, padding=5)
 
-# Hide window, open file, and open window back up
+# On App start hide window, open file, and open window back up
 window.withdraw()
 file_open()
 window.deiconify()
